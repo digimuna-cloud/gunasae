@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Riba KPR — Gunasae | Rumah Syariah</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g-dark: #0D2218;
+  --g: #1B4332;
+  --g-mid: #2D6A4F;
+  --g-light: #40916C;
+  --g-pale: #B7E4C7;
+  --g-ghost: #E9F5EC;
+  --gold: #C9A84C;
+  --gold-light: #F0D080;
+  --gold-pale: #FDF8EC;
+  --red: #C0392B;
+  --red-light: #E74C3C;
+  --red-pale: #FEF0EE;
+  --ink: #1A1A2E;
+  --ink-mid: #3D3D5C;
+  --ink-soft: #6B6B8A;
+  --paper: #F8F7F3;
+  --white: #FFFFFF;
+  --border: rgba(27,67,50,.12);
+  --shadow-sm: 0 2px 12px rgba(13,34,24,.08);
+  --shadow-md: 0 8px 32px rgba(13,34,24,.12);
+  --shadow-lg: 0 24px 64px rgba(13,34,24,.18);
+  --r: 16px;
+  --r-sm: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.hero {
+  background: var(--g-dark);
+  background-image: radial-gradient(ellipse at 20% 50%, rgba(45,106,79,.5) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 20%, rgba(201,168,76,.15) 0%, transparent 50%);
+  padding: 52px 24px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,.025) 40px),
+                    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,.025) 40px);
+  pointer-events: none;
+}
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(201,168,76,.15);
+  border: 1px solid rgba(201,168,76,.3);
+  border-radius: 99px;
+  padding: 6px 14px;
+  margin-bottom: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+.brand-dot {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 7vw, 48px);
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.hero h1 span { color: var(--gold-light); }
+.hero p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,.65);
+  max-width: 460px;
+  margin: 0 auto 0;
+}
+.ayat {
+  display: inline-block;
+  margin-top: 24px;
+  background: rgba(201,168,76,.1);
+  border: 1px solid rgba(201,168,76,.2);
+  border-radius: var(--r-sm);
+  padding: 12px 18px;
+  font-size: 12px;
+  color: rgba(255,255,255,.7);
+  line-height: 1.6;
+  font-style: italic;
+  max-width: 440px;
+}
+.ayat strong { color: var(--gold-light); font-style: normal; font-weight: 600; }
+
+/* ── CONTAINER ── */
+.container { max-width: 760px; margin: 0 auto; padding: 32px 16px 60px; }
+
+/* ── STEP LABEL ── */
+.step-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.step-num {
+  width: 28px; height: 28px;
+  background: var(--g);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  flex: none;
+}
+.step-label h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--g);
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--white);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+/* ── INPUTS ── */
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media(max-width: 480px) { .input-grid { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-mid);
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+.field .sublabel {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: -4px;
+}
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-wrap .prefix {
+  position: absolute;
+  left: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+.input-wrap .suffix {
+  position: absolute;
+  right: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+.input-wrap input {
+  width: 100%;
+  padding: 11px 40px 11px 40px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-family: 'DM Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  -moz-appearance: textfield;
+}
+.input-wrap input::-webkit-outer-spin-button,
+.input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.input-wrap input:focus {
+  border-color: var(--g-light);
+  box-shadow: 0 0 0 3px rgba(64,145,108,.12);
+  background: var(--white);
+}
+.input-wrap.no-prefix input { padding-left: 14px; }
+
+/* Slider */
+.slider-wrap { margin-top: 4px; }
+.slider-wrap input[type=range] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--g-light) 0%, var(--g-light) var(--pct, 50%), var(--border) var(--pct, 50%), var(--border) 100%);
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+}
+.slider-wrap input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--g);
+  border: 2px solid var(--white);
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  cursor: pointer;
+}
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  font-weight: 500;
+}
+.full-col { grid-column: 1 / -1; }
+
+/* ── HITUNG BUTTON ── */
+.btn-hitung {
+  width: 100%;
+  padding: 16px;
+  background: var(--g);
+  color: var(--white);
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  cursor: pointer;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: background .2s, transform .1s, box-shadow .2s;
+  box-shadow: 0 4px 16px rgba(27,67,50,.3);
+}
+.btn-hitung::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.btn-hitung:hover { background: var(--g-mid); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(27,67,50,.35); }
+.btn-hitung:active { transform: translateY(0); }
+
+/* ── HASIL TERSEMBUNYI ── */
+#hasil { display: none; }
+#hasil.show { display: block; animation: fadeUp .5s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── VERDICT BANNER ── */
+.verdict {
+  background: var(--red-pale);
+  border: 1.5px solid rgba(192,57,43,.2);
+  border-radius: var(--r);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.verdict-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.verdict-icon {
+  width: 44px; height: 44px;
+  background: var(--red-light);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex: none;
+  animation: shake 3s 1s infinite;
+}
+@keyframes shake { 0%,90%,100%{transform:rotate(0deg)} 92%{transform:rotate(-10deg)} 96%{transform:rotate(10deg)} }
+.verdict-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.verdict-sub { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+.verdict-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media(max-width:480px) { .verdict-row { grid-template-columns: 1fr; } }
+.verdict-stat {
+  background: var(--white);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  border: 1px solid rgba(192,57,43,.12);
+}
+.verdict-stat .vs-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+}
+.verdict-stat .vs-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.verdict-stat .vs-num.big { font-size: 24px; }
+.verdict-stat .vs-sub { font-size: 11px; color: var(--ink-soft); }
+
+/* ── BREAKDOWN CARDS ── */
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+@media(max-width:480px) { .breakdown-grid { grid-template-columns: 1fr; } }
+.bcard {
+  border-radius: var(--r);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.bcard.green { background: var(--g-ghost); border: 1.5px solid rgba(27,67,50,.12); }
+.bcard.red { background: var(--red-pale); border: 1.5px solid rgba(192,57,43,.12); }
+.bcard.gold { background: var(--gold-pale); border: 1.5px solid rgba(201,168,76,.2); }
+.bcard.ink { background: #F0EFF8; border: 1.5px solid rgba(61,61,92,.12); }
+.bcard-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 8px;
+}
+.bcard.green .bcard-label { color: var(--g-mid); }
+.bcard.red .bcard-label { color: var(--red); }
+.bcard.gold .bcard-label { color: var(--gold); }
+.bcard.ink .bcard-label { color: var(--ink-mid); }
+.bcard-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.bcard.green .bcard-num { color: var(--g); }
+.bcard.red .bcard-num { color: var(--red); }
+.bcard.gold .bcard-num { color: var(--gold); }
+.bcard.ink .bcard-num { color: var(--ink-mid); }
+.bcard-desc { font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
+
+/* ── PROPORSI VISUAL ── */
+.proporsi-section { margin-bottom: 20px; }
+.proporsi-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.bar-container {
+  border-radius: 99px;
+  overflow: hidden;
+  height: 32px;
+  display: flex;
+  margin-bottom: 10px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.08);
+}
+.bar-pokok {
+  background: var(--g);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+  min-width: 60px;
+  overflow: hidden;
+}
+.bar-riba {
+  background: var(--red-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+  min-width: 60px;
+  overflow: hidden;
+  flex: 1;
+}
+.bar-legend {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-mid);
+  font-weight: 500;
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+
+/* ── AMORTISASI TAHUN PERTAMA ── */
+.amort-section { margin-bottom: 20px; }
+.amort-title {
+  font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 6px;
+}
+.amort-sub { font-size: 12px; color: var(--ink-soft); margin-bottom: 14px; line-height: 1.5; }
+.amort-table-wrap { overflow-x: auto; border-radius: var(--r-sm); border: 1px solid var(--border); }
+.amort-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.amort-table thead {
+  background: var(--g);
+  color: var(--white);
+}
+.amort-table th {
+  padding: 10px 12px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.amort-table th:first-child { text-align: center; }
+.amort-table tbody tr { border-bottom: 1px solid var(--border); }
+.amort-table tbody tr:last-child { border-bottom: none; }
+.amort-table tbody tr:nth-child(even) { background: var(--paper); }
+.amort-table td {
+  padding: 9px 12px;
+  text-align: right;
+  font-family: 'DM Mono', monospace;
+  font-size: 11.5px;
+  color: var(--ink-mid);
+  white-space: nowrap;
+}
+.amort-table td:first-child {
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  color: var(--g);
+  font-size: 12px;
+}
+.amort-table td.bunga { color: var(--red); font-weight: 600; }
+.amort-table td.pokok { color: var(--g); font-weight: 600; }
+.amort-table tfoot td {
+  background: var(--g-ghost);
+  font-weight: 700;
+  color: var(--ink);
+  padding: 10px 12px;
+  border-top: 2px solid var(--g-pale);
+}
+.amort-table tfoot td:first-child { color: var(--g); font-size: 11px; text-align: center; }
+.amort-table tfoot td.bunga { color: var(--red); }
+.amort-table tfoot td.pokok { color: var(--g); }
+
+/* toggle */
+.toggle-btn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--r-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all .2s;
+}
+.toggle-btn:hover { border-color: var(--g-light); color: var(--g); background: var(--g-ghost); }
+
+/* ── PERBANDINGAN SYARIAH ── */
+.syariah-section { margin-bottom: 20px; }
+.syariah-header {
+  background: var(--g);
+  border-radius: var(--r) var(--r) 0 0;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.syariah-header .sh-icon {
+  font-size: 22px;
+  width: 40px; height: 40px;
+  background: rgba(255,255,255,.1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex: none;
+}
+.syariah-header .sh-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 2px;
+}
+.syariah-header .sh-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,.65);
+}
+.syariah-body {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--r) var(--r);
+  padding: 20px;
+}
+.compare-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+@media(max-width:500px) {
+  .compare-row { grid-template-columns: 1fr; }
+  .compare-vs { text-align: center; }
+}
+.compare-side {
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+}
+.compare-side.bank {
+  background: var(--red-pale);
+  border: 1px solid rgba(192,57,43,.15);
+}
+.compare-side.syariah {
+  background: var(--g-ghost);
+  border: 1px solid rgba(27,67,50,.12);
+}
+.compare-side .cs-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 8px;
+}
+.compare-side.bank .cs-label { color: var(--red); }
+.compare-side.syariah .cs-label { color: var(--g); }
+.compare-side .cs-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+  font-size: 12px;
+}
+.compare-side .cs-item:last-child { border-bottom: none; }
+.compare-side .cs-item .ci-key { color: var(--ink-soft); }
+.compare-side .cs-item .ci-val {
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  font-size: 12px;
+}
+.compare-side.bank .ci-val { color: var(--red); }
+.compare-side.syariah .ci-val { color: var(--g); }
+.compare-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 30px;
+}
+.vs-badge {
+  width: 36px; height: 36px;
+  background: var(--ink);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+.perbedaan-box {
+  background: linear-gradient(135deg, var(--g-dark) 0%, var(--g) 100%);
+  border-radius: var(--r-sm);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.pb-text { color: rgba(255,255,255,.75); font-size: 13px; line-height: 1.5; }
+.pb-text strong { color: var(--white); font-size: 14px; display: block; margin-bottom: 2px; }
+.pb-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold-light);
+  white-space: nowrap;
+}
+
+/* ── PERBEDAAN ESENSIAL ── */
+.insight-section { margin-bottom: 20px; }
+.insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media(max-width:480px) { .insight-grid { grid-template-columns: 1fr; } }
+.insight-item {
+  border-radius: var(--r-sm);
+  padding: 16px;
+  border: 1px solid var(--border);
+  background: var(--white);
+}
+.insight-icon { font-size: 22px; margin-bottom: 8px; }
+.insight-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+.insight-desc {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.insight-item.good { background: var(--g-ghost); border-color: rgba(27,67,50,.12); }
+.insight-item.bad { background: var(--red-pale); border-color: rgba(192,57,43,.1); }
+
+/* ── CTA ── */
+.cta-section {
+  background: var(--g-dark);
+  background-image: radial-gradient(ellipse at 70% 50%, rgba(201,168,76,.15) 0%, transparent 60%);
+  border-radius: var(--r);
+  padding: 28px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,.01) 21px);
+}
+.cta-tag {
+  display: inline-block;
+  background: rgba(201,168,76,.15);
+  border: 1px solid rgba(201,168,76,.3);
+  border-radius: 99px;
+  padding: 4px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 14px;
+}
+.cta-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 5vw, 28px);
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+.cta-title span { color: var(--gold-light); }
+.cta-text { font-size: 13px; color: rgba(255,255,255,.65); margin-bottom: 20px; line-height: 1.6; }
+.cta-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.kw {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: background .2s;
+}
+.kw:hover { background: rgba(255,255,255,.13); }
+.kw span { font-size: 10px; color: rgba(255,255,255,.5); font-family: 'DM Sans', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: .3px; }
+.cta-note { font-size: 11px; color: rgba(255,255,255,.4); }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  padding: 24px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--white);
+}
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--g);
+  margin-bottom: 4px;
+}
+.footer-logo span { color: var(--gold); }
+.footer-sub { font-size: 11px; color: var(--ink-soft); margin-bottom: 10px; }
+.footer-disc {
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── PRINT ── */
+.print-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-mid);
+  cursor: pointer;
+  transition: all .2s;
+  margin: 0 auto 24px;
+}
+.print-btn:hover { border-color: var(--g-light); color: var(--g); background: var(--g-ghost); }
+
+/* Tooltip */
+.tooltip-wrap { position: relative; display: inline-block; margin-left: 4px; }
+.tooltip-icon {
+  width: 14px; height: 14px;
+  background: var(--ink-soft);
+  color: white;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: help;
+  vertical-align: middle;
+}
+.tooltip-box {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: white;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  width: 200px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s;
+  z-index: 10;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+.tooltip-wrap:hover .tooltip-box { opacity: 1; }
+
+@media print {
+  .btn-hitung, .print-btn, .toggle-btn, .cta-section { display: none !important; }
+  body { background: white; }
+  .hero { background: var(--g-dark) !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+
+/* Animasi counter */
+.counting { animation: countUp .8s ease; }
+@keyframes countUp { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="brand-pill"><div class="brand-dot"></div> Freebie Gratis dari Gunasae</div>
+  <h1>Kalkulator<br><span>Riba KPR</span></h1>
+  <p>Hitung berapa riba yang akan kamu bayar di KPR bank — dalam rupiah nyata yang bisa diverifikasi dari kontrak kamu sendiri.</p>
+  <div class="ayat">
+    <strong>"…Allah telah menghalalkan jual beli dan mengharamkan riba…"</strong><br>
+    QS. Al-Baqarah: 275
+  </div>
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+  <!-- STEP 1: INPUT -->
+  <div class="step-label">
+    <div class="step-num">1</div>
+    <h2>Masukkan data KPR lo</h2>
+  </div>
+  <div class="card">
+    <div class="input-grid">
+
+      <div class="field">
+        <label>Harga Properti
+          <div class="tooltip-wrap">
+            <span class="tooltip-icon">?</span>
+            <div class="tooltip-box">Harga total properti yang akan dibeli sebelum dikurangi uang muka (DP).</div>
+          </div>
+        </label>
+        <div class="sublabel">Total harga properti</div>
+        <div class="input-wrap">
+          <span class="prefix">Rp</span>
+          <input type="number" id="harga" value="500000000" min="100000000" max="10000000000" step="10000000">
+        </div>
+        <div class="slider-wrap">
+          <input type="range" id="harga-slider" min="100000000" max="3000000000" step="10000000" value="500000000">
+          <div class="slider-labels"><span>100 jt</span><span>3 M</span></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Uang Muka (DP)
+          <div class="tooltip-wrap">
+            <span class="tooltip-icon">?</span>
+            <div class="tooltip-box">Down Payment yang kamu bayar di awal. Semakin besar DP, semakin kecil plafon KPR dan riba yang dibayar.</div>
+          </div>
+        </label>
+        <div class="sublabel">Persentase dari harga</div>
+        <div class="input-wrap">
+          <input type="number" id="dp" value="20" min="0" max="90" step="5" style="padding-left:14px">
+          <span class="suffix">%</span>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" id="dp-slider" min="0" max="50" step="5" value="20">
+          <div class="slider-labels"><span>0%</span><span>50%</span></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Bunga per Tahun
+          <div class="tooltip-wrap">
+            <span class="tooltip-icon">?</span>
+            <div class="tooltip-box">Suku bunga KPR bank konvensional. Bunga fixed biasanya 7–12% di tahun pertama, lalu floating mengikuti BI rate.</div>
+          </div>
+        </label>
+        <div class="sublabel">Rata-rata bunga bank saat ini</div>
+        <div class="input-wrap">
+          <input type="number" id="bunga" value="11" min="1" max="30" step="0.5" style="padding-left:14px">
+          <span class="suffix">%</span>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" id="bunga-slider" min="1" max="20" step="0.5" value="11">
+          <div class="slider-labels"><span>1%</span><span>20%</span></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tenor / Jangka Waktu
+          <div class="tooltip-wrap">
+            <span class="tooltip-icon">?</span>
+            <div class="tooltip-box">Berapa tahun kamu akan mencicil. Tenor lebih panjang = cicilan lebih kecil per bulan, tapi total riba jauh lebih besar.</div>
+          </div>
+        </label>
+        <div class="sublabel">Lama cicilan KPR</div>
+        <div class="input-wrap">
+          <input type="number" id="tenor" value="20" min="1" max="30" step="1" style="padding-left:14px">
+          <span class="suffix">tahun</span>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" id="tenor-slider" min="1" max="30" step="1" value="20">
+          <div class="slider-labels"><span>1 th</span><span>30 th</span></div>
+        </div>
+      </div>
+
+      <div class="field full-col">
+        <label>Margin Syariah (untuk perbandingan)
+          <div class="tooltip-wrap">
+            <span class="tooltip-icon">?</span>
+            <div class="tooltip-box">Margin keuntungan lembaga syariah yang disepakati di awal dan tidak berubah. Biasanya 9–14% flat dari plafon. Berbeda dari bunga bank yang bisa berubah-ubah.</div>
+          </div>
+        </label>
+        <div class="sublabel">Persentase dari plafon, ditetapkan sekali di hari pertama akad — tidak berubah selamanya</div>
+        <div class="input-wrap" style="max-width:220px">
+          <input type="number" id="margin" value="10" min="1" max="25" step="0.5" style="padding-left:14px">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+
+    </div>
+    <button class="btn-hitung" onclick="hitung()">⚡ Hitung Sekarang — Lihat Angka Ribanya</button>
+  </div>
+
+  <!-- HASIL -->
+  <div id="hasil">
+
+    <!-- STEP 2: VERDICT -->
+    <div class="step-label">
+      <div class="step-num">2</div>
+      <h2>Ini angka riba yang akan kamu bayar</h2>
+    </div>
+    <div class="verdict" id="verdict-box">
+      <div class="verdict-top">
+        <div class="verdict-icon">🚨</div>
+        <div>
+          <div class="verdict-title" id="verdict-title">kamu akan membayar riba sebesar...</div>
+          <div class="verdict-sub" id="verdict-sub"></div>
+        </div>
+      </div>
+      <div class="verdict-row">
+        <div class="verdict-stat">
+          <div class="vs-label">Plafon KPR (yang dipinjam)</div>
+          <div class="vs-num big" id="v-plafon">—</div>
+          <div class="vs-sub">Pokok hutang yang sebenarnya</div>
+        </div>
+        <div class="verdict-stat">
+          <div class="vs-label">Total Riba yang Dibayar</div>
+          <div class="vs-num big" id="v-riba">—</div>
+          <div class="vs-sub" id="v-riba-pct">—% dari total pembayaran</div>
+        </div>
+        <div class="verdict-stat">
+          <div class="vs-label">Total Bayar Sampai Lunas</div>
+          <div class="vs-num" id="v-total">—</div>
+          <div class="vs-sub" id="v-lebih">Lebih dari plafon: <strong id="v-lebih-num">—</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BREAKDOWN CARDS -->
+    <div class="breakdown-grid">
+      <div class="bcard green">
+        <div class="bcard-label">Cicilan per Bulan</div>
+        <div class="bcard-num" id="b-cicilan">—</div>
+        <div class="bcard-desc">Yang kamu bayar setiap bulan selama <span id="b-tenor">—</span> tahun ke depan</div>
+      </div>
+      <div class="bcard red">
+        <div class="bcard-label">Bunga Bulan Pertama</div>
+        <div class="bcard-num" id="b-bunga1">—</div>
+        <div class="bcard-desc">Dari cicilan bulan pertama, sebesar <span id="b-bunga1-pct">—</span> adalah bunga murni</div>
+      </div>
+      <div class="bcard gold">
+        <div class="bcard-label">Porsi Riba per Cicilan (Bulan 1)</div>
+        <div class="bcard-num" id="b-pct-riba">—</div>
+        <div class="bcard-desc">Dari tiap cicilan yang kamu bayar, hanya <span id="b-pct-pokok">—</span> yang mengurangi hutang</div>
+      </div>
+      <div class="bcard ink">
+        <div class="bcard-label">Total Bulan Cicilan</div>
+        <div class="bcard-num" id="b-bulan">—</div>
+        <div class="bcard-desc">Jumlah kali kamu mentransfer uang ke bank</div>
+      </div>
+    </div>
+
+    <!-- PROPORSI VISUAL -->
+    <div class="step-label">
+      <div class="step-num">3</div>
+      <h2>Dari uang yang kamu bayar, ini proporsinya</h2>
+    </div>
+    <div class="card proporsi-section">
+      <div class="proporsi-title" id="proporsi-label">Dari total Rp 0 yang kamu bayar ke bank...</div>
+      <div class="bar-container">
+        <div class="bar-pokok" id="bar-pokok" style="width:40%">Pokok</div>
+        <div class="bar-riba" id="bar-riba" style="width:60%">Riba</div>
+      </div>
+      <div class="bar-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--g)"></div>
+          <span><strong id="leg-pokok">—</strong> Pokok hutang yang dikembalikan</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--red-light)"></div>
+          <span><strong id="leg-riba">—</strong> Riba yang masuk ke kantong bank</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMORTISASI -->
+    <div class="step-label">
+      <div class="step-num">4</div>
+      <h2>Tabel amortisasi — riba vs pokok per tahun</h2>
+    </div>
+    <div class="card amort-section">
+      <div class="amort-title">Detail cicilan per tahun: berapa yang beneran ngurangi hutang lo?</div>
+      <div class="amort-sub">Angka ini ada di kontrak KPR kamu — tabel amortisasi. Buka kontrak kamu dan bandingkan. Perhatikan kolom BUNGA (riba) vs POKOK di tahun-tahun pertama.</div>
+      <div class="amort-table-wrap">
+        <table class="amort-table">
+          <thead>
+            <tr>
+              <th>Tahun ke-</th>
+              <th>Cicilan/Bulan</th>
+              <th>Total Bayar Tahun Ini</th>
+              <th class="bunga" style="color:#FFB3AE">Riba Tahun Ini ⚠</th>
+              <th class="pokok" style="color:var(--g-pale)">Pokok Tahun Ini</th>
+              <th>% Riba</th>
+              <th>Sisa Hutang</th>
+            </tr>
+          </thead>
+          <tbody id="amort-body"></tbody>
+          <tfoot>
+            <tr>
+              <td>TOTAL</td>
+              <td>—</td>
+              <td id="ft-total">—</td>
+              <td class="bunga" id="ft-riba">—</td>
+              <td class="pokok" id="ft-pokok">—</td>
+              <td id="ft-pct">—</td>
+              <td>Rp 0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <button class="toggle-btn" id="toggle-amort" onclick="toggleAmort()">▼ Tampilkan semua tahun</button>
+    </div>
+
+    <!-- PERBANDINGAN SYARIAH -->
+    <div class="step-label">
+      <div class="step-num">5</div>
+      <h2>Perbandingan: KPR Bank vs Akad Syariah</h2>
+    </div>
+    <div class="syariah-section">
+      <div class="syariah-header">
+        <div class="sh-icon">⚖️</div>
+        <div>
+          <div class="sh-title">KPR Bank Konvensional vs Murabahah Syariah</div>
+          <div class="sh-sub">Properti yang sama, plafon yang sama — mekanisme yang berbeda secara fundamental</div>
+        </div>
+      </div>
+      <div class="syariah-body">
+        <div class="compare-row">
+          <div class="compare-side bank">
+            <div class="cs-label">🏦 KPR Bank Konvensional</div>
+            <div class="cs-item"><span class="ci-key">Plafon</span><span class="ci-val" id="cs-plafon-bank">—</span></div>
+            <div class="cs-item"><span class="ci-key">Bunga per tahun</span><span class="ci-val" id="cs-bunga-bank">—</span></div>
+            <div class="cs-item"><span class="ci-key">Tenor</span><span class="ci-val" id="cs-tenor-bank">—</span></div>
+            <div class="cs-item"><span class="ci-key">Cicilan/bulan</span><span class="ci-val" id="cs-cicilan-bank">—</span></div>
+            <div class="cs-item"><span class="ci-key">Total bayar</span><span class="ci-val" id="cs-total-bank">—</span></div>
+            <div class="cs-item"><span class="ci-key">Biaya riba</span><span class="ci-val" id="cs-riba-bank">—</span></div>
+            <div class="cs-item"><span class="ci-key">Harga bisa berubah?</span><span class="ci-val" style="color:var(--red)">YA ⚠️</span></div>
+            <div class="cs-item"><span class="ci-key">Denda ribawi?</span><span class="ci-val" style="color:var(--red)">YA ⚠️</span></div>
+          </div>
+          <div class="compare-vs"><div class="vs-badge">VS</div></div>
+          <div class="compare-side syariah">
+            <div class="cs-label">🕌 Akad Murabahah Syariah</div>
+            <div class="cs-item"><span class="ci-key">Plafon</span><span class="ci-val" id="cs-plafon-sy">—</span></div>
+            <div class="cs-item"><span class="ci-key">Margin (fix)</span><span class="ci-val" id="cs-margin-sy">—</span></div>
+            <div class="cs-item"><span class="ci-key">Tenor</span><span class="ci-val" id="cs-tenor-sy">—</span></div>
+            <div class="cs-item"><span class="ci-key">Cicilan/bulan</span><span class="ci-val" id="cs-cicilan-sy">—</span></div>
+            <div class="cs-item"><span class="ci-key">Total bayar</span><span class="ci-val" id="cs-total-sy">—</span></div>
+            <div class="cs-item"><span class="ci-key">Biaya tambahan</span><span class="ci-val" id="cs-margin-num-sy">—</span></div>
+            <div class="cs-item"><span class="ci-key">Harga bisa berubah?</span><span class="ci-val" style="color:var(--g)">TIDAK ✓</span></div>
+            <div class="cs-item"><span class="ci-key">Denda ribawi?</span><span class="ci-val" style="color:var(--g)">TIDAK ✓</span></div>
+          </div>
+        </div>
+        <div class="perbedaan-box">
+          <div class="pb-text">
+            <strong>Selisih total yang kamu bayar</strong>
+            Perbedaan antara total bayar KPR bank vs akad syariah untuk properti yang sama
+          </div>
+          <div class="pb-num" id="pb-selisih">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHT -->
+    <div class="step-label">
+      <div class="step-num">6</div>
+      <h2>Yang benar-benar berbeda antara keduanya</h2>
+    </div>
+    <div class="card insight-section">
+      <div class="insight-grid">
+        <div class="insight-item bad">
+          <div class="insight-icon">❌</div>
+          <div class="insight-title">KPR Bank: Bunga Bisa Naik Kapan Saja</div>
+          <div class="insight-desc">KPR floating rate berarti bank bisa ubah bunga mengikuti BI rate. kamu tidak pernah tahu total yang harus dibayar sampai lunas. Cicilan hari ini ≠ cicilan 10 tahun lagi.</div>
+        </div>
+        <div class="insight-item good">
+          <div class="insight-icon">✅</div>
+          <div class="insight-title">Syariah: Harga Fix Sejak Hari Akad</div>
+          <div class="insight-desc">Di akad murabahah, harga jual disepakati hari pertama dan tidak berubah sampai cicilan terakhir. kamu tahu persis total yang dibayar sejak hari akad ditandatangani.</div>
+        </div>
+        <div class="insight-item bad">
+          <div class="insight-icon">❌</div>
+          <div class="insight-title">KPR Bank: Denda Ribawi untuk Keterlambatan</div>
+          <div class="insight-desc">Terlambat bayar cicilan = kena denda berbasis bunga. Denda ini ditambahkan ke pokok, sehingga total hutang bisa membengkak jika ada periode sulit.</div>
+        </div>
+        <div class="insight-item good">
+          <div class="insight-icon">✅</div>
+          <div class="insight-title">Syariah: Mekanisme Penyelesaian yang Adil</div>
+          <div class="insight-desc">Akad syariah memiliki mekanisme restrukturisasi yang tidak berbasis denda ribawi. Ada jalur penyelesaian yang tertulis dalam kontrak dan lebih melindungi pembeli.</div>
+        </div>
+        <div class="insight-item bad">
+          <div class="insight-icon">❌</div>
+          <div class="insight-title">70–80% Cicilan Awal Adalah Bunga Murni</div>
+          <div class="insight-desc">Di 5 tahun pertama, sebagian besar yang kamu bayar masuk ke bunga bank — bukan pengurangan hutang lo. kamu membayar banyak tapi hutang turunnya lambat sekali.</div>
+        </div>
+        <div class="insight-item good">
+          <div class="insight-icon">✅</div>
+          <div class="insight-title">Syariah: Setiap Cicilan Konsisten dan Transparan</div>
+          <div class="insight-desc">Proporsi pelunasan pokok di akad syariah lebih terstruktur dan predictable. kamu tahu persis sisa hutang kamu setiap bulan tanpa perlu buka kalkulator amortisasi.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRINT BUTTON -->
+    <button class="print-btn" onclick="window.print()">
+      🖨️ Simpan / Print Hasil Kalkulator Ini
+    </button>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <div class="cta-tag">Langkah Selanjutnya</div>
+      <div class="cta-title">Sudah tahu angkanya.<br><span>Apa yang kamu lakukan selanjutnya?</span></div>
+      <div class="cta-text">Properti syariah dengan akad murabahah yang benar sudah tersedia di Jabodetabek.<br>Konsultasi gratis — kami bantu simulasikan berdasarkan situasi kamu yang spesifik.</div>
+      <div class="cta-keywords">
+        <div class="kw">KONSULTASI<span>Sesi gratis 30 mnt</span></div>
+        <div class="kw">AKAD<span>Panduan murabahah</span></div>
+        <div class="kw">CHECKLIST<span>15 poin verifikasi</span></div>
+        <div class="kw">PETA<span>6 properti syariah</span></div>
+        <div class="kw">TAKEOVER<span>Pindah dari KPR bank</span></div>
+      </div>
+      <div class="cta-note">DM Kalkulator ke Instagram @gunasae — kami baca dan balas semua yang masuk</div>
+    </div>
+
+  </div><!-- /hasil -->
+
+</div><!-- /container -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-logo">guna<span>sae</span></div>
+  <div class="footer-sub">Rumah Syariah · Halal Business Advisor · 15+ Tahun Pengalaman</div>
+  <div class="footer-disc">
+    Kalkulator ini menggunakan rumus amortisasi standar (metode anuitas) untuk kalkulasi KPR bank konvensional. Angka aktual dapat berbeda tergantung kebijakan bank, biaya administrasi, dan perubahan suku bunga floating. Konsultasikan dengan advisor sebelum mengambil keputusan.
+  </div>
+</div>
+
+<script>
+// ── FORMAT RUPIAH ──
+function fmtRp(n, short) {
+  if (n === undefined || n === null || isNaN(n)) return '—';
+  if (short) {
+    if (n >= 1e12) return 'Rp ' + (n/1e12).toFixed(2).replace(/\.?0+$/,'') + ' T';
+    if (n >= 1e9) return 'Rp ' + (n/1e9).toFixed(2).replace(/\.?0+$/,'') + ' M';
+    if (n >= 1e6) return 'Rp ' + (n/1e6).toFixed(1).replace(/\.?0+$/,'') + ' jt';
+    return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+  }
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+// ── SLIDER SYNC ──
+function syncSlider(inputId, sliderId) {
+  const inp = document.getElementById(inputId);
+  const sld = document.getElementById(sliderId);
+  if (!sld) return;
+  inp.addEventListener('input', () => {
+    sld.value = inp.value;
+    updateSliderBg(sld);
+  });
+  sld.addEventListener('input', () => {
+    inp.value = sld.value;
+    updateSliderBg(sld);
+  });
+  updateSliderBg(sld);
+}
+function updateSliderBg(sld) {
+  const min = +sld.min, max = +sld.max, val = +sld.value;
+  const pct = ((val - min) / (max - min)) * 100;
+  sld.style.setProperty('--pct', pct + '%');
+}
+syncSlider('harga', 'harga-slider');
+syncSlider('dp', 'dp-slider');
+syncSlider('bunga', 'bunga-slider');
+syncSlider('tenor', 'tenor-slider');
+
+// ── AMORTISASI STATE ──
+let amortData = [];
+let showAllAmort = false;
+
+function toggleAmort() {
+  showAllAmort = !showAllAmort;
+  renderAmort();
+}
+
+function renderAmort() {
+  const tbody = document.getElementById('amort-body');
+  const btn = document.getElementById('toggle-amort');
+  const rows = showAllAmort ? amortData : amortData.slice(0, 5);
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.tahun}</td>
+      <td>${fmtRp(r.cicilan)}</td>
+      <td>${fmtRp(r.totalTahun)}</td>
+      <td class="bunga">${fmtRp(r.totalBunga)}</td>
+      <td class="pokok">${fmtRp(r.totalPokok)}</td>
+      <td class="${r.pctBunga > 60 ? 'bunga' : r.pctBunga > 40 ? '' : 'pokok'}">${fmtPct(r.pctBunga)}</td>
+      <td>${fmtRp(r.sisaHutang)}</td>
+    </tr>
+  `).join('');
+  if (!showAllAmort && amortData.length > 5) {
+    btn.textContent = '▼ Tampilkan semua ' + amortData.length + ' tahun';
+    btn.style.display = 'block';
+  } else if (amortData.length > 5) {
+    btn.textContent = '▲ Sembunyikan';
+    btn.style.display = 'block';
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+// ── HITUNG UTAMA ──
+function hitung() {
+  const harga = +document.getElementById('harga').value;
+  const dpPct = +document.getElementById('dp').value / 100;
+  const bungaTahunan = +document.getElementById('bunga').value / 100;
+  const tenorTahun = +document.getElementById('tenor').value;
+  const marginPct = +document.getElementById('margin').value / 100;
+
+  // Validasi
+  if (!harga || !bungaTahunan || !tenorTahun) {
+    alert('Isi semua kolom terlebih dahulu.');
+    return;
+  }
+
+  const dp = harga * dpPct;
+  const plafon = harga - dp;
+  const r = bungaTahunan / 12;      // bunga per bulan
+  const n = tenorTahun * 12;         // total bulan
+
+  // Cicilan per bulan (anuitas)
+  const cicilan = r > 0
+    ? plafon * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)
+    : plafon / n;
+
+  const totalBayar = cicilan * n;
+  const totalRiba = totalBayar - plafon;
+  const pctRiba = (totalRiba / totalBayar) * 100;
+  const pctPokok = 100 - pctRiba;
+
+  // Bunga bulan pertama
+  const bunga1 = plafon * r;
+  const pokok1 = cicilan - bunga1;
+  const pct1Riba = (bunga1 / cicilan) * 100;
+
+  // Amortisasi per tahun
+  amortData = [];
+  let sisaHutang = plafon;
+  let totalRibaAcc = 0, totalPokokAcc = 0, totalBayarAcc = 0;
+  for (let t = 1; t <= tenorTahun; t++) {
+    let ribaThisYear = 0, pokokThisYear = 0;
+    for (let m = 0; m < 12; m++) {
+      const bungaBulan = sisaHutang * r;
+      const pokokBulan = cicilan - bungaBulan;
+      ribaThisYear += bungaBulan;
+      pokokThisYear += pokokBulan;
+      sisaHutang = Math.max(0, sisaHutang - pokokBulan);
+    }
+    totalRibaAcc += ribaThisYear;
+    totalPokokAcc += pokokThisYear;
+    totalBayarAcc += cicilan * 12;
+    amortData.push({
+      tahun: t,
+      cicilan: cicilan,
+      totalTahun: cicilan * 12,
+      totalBunga: ribaThisYear,
+      totalPokok: pokokThisYear,
+      pctBunga: (ribaThisYear / (cicilan * 12)) * 100,
+      sisaHutang: Math.max(0, sisaHutang)
+    });
+  }
+
+  // Syariah: murabahah flat
+  // Total harga jual = plafon + (plafon × margin × tenor)
+  const totalSyariah = plafon + (plafon * marginPct * tenorTahun);
+  const cicilanSyariah = totalSyariah / n;
+  const marginNominal = plafon * marginPct * tenorTahun;
+
+  // Selisih
+  const selisih = totalBayar - totalSyariah;
+
+  // ── RENDER ──
+  document.getElementById('hasil').classList.add('show');
+
+  // Verdict
+  document.getElementById('verdict-title').textContent =
+    'kamu akan membayar riba sebesar ' + fmtRp(totalRiba, true) + ' ke bank';
+  document.getElementById('verdict-sub').textContent =
+    'Untuk properti seharga ' + fmtRp(harga, true) + ' dengan DP ' +
+    document.getElementById('dp').value + '% (' + fmtRp(dp, true) + '), plafon KPR ' +
+    fmtRp(plafon, true) + ', bunga ' + document.getElementById('bunga').value + '% per tahun, tenor ' +
+    tenorTahun + ' tahun. Riba ini adalah uang yang masuk ke kantong bank — bukan bagian dari nilai properti lo.';
+
+  setText('v-plafon', fmtRp(plafon, true));
+  setText('v-riba', fmtRp(totalRiba, true));
+  document.getElementById('v-riba-pct').textContent = fmtPct(pctRiba) + ' dari total pembayaran kamu adalah riba';
+  setText('v-total', fmtRp(totalBayar, true));
+  document.getElementById('v-lebih-num').textContent = fmtRp(totalRiba, true);
+
+  // Breakdown cards
+  setText('b-cicilan', fmtRp(cicilan, true));
+  document.getElementById('b-tenor').textContent = tenorTahun;
+  setText('b-bunga1', fmtRp(bunga1, true));
+  document.getElementById('b-bunga1-pct').textContent = fmtPct(pct1Riba);
+  setText('b-pct-riba', fmtPct(pct1Riba));
+  document.getElementById('b-pct-pokok').textContent = fmtPct(100 - pct1Riba);
+  setText('b-bulan', n + ' kali');
+
+  // Proporsi bar
+  document.getElementById('proporsi-label').textContent =
+    'Dari total ' + fmtRp(totalBayar) + ' yang kamu bayar ke bank...';
+  setTimeout(() => {
+    document.getElementById('bar-pokok').style.width = fmtPct(pctPokok);
+    document.getElementById('bar-pokok').textContent = fmtPct(pctPokok);
+    document.getElementById('bar-riba').textContent = fmtPct(pctRiba);
+  }, 100);
+  document.getElementById('leg-pokok').textContent = fmtRp(plafon, true) + ' (' + fmtPct(pctPokok) + ')';
+  document.getElementById('leg-riba').textContent = fmtRp(totalRiba, true) + ' (' + fmtPct(pctRiba) + ')';
+
+  // Amortisasi tabel footer
+  document.getElementById('ft-total').textContent = fmtRp(totalBayarAcc);
+  document.getElementById('ft-riba').textContent = fmtRp(totalRibaAcc);
+  document.getElementById('ft-pokok').textContent = fmtRp(totalPokokAcc);
+  document.getElementById('ft-pct').textContent = fmtPct((totalRibaAcc/totalBayarAcc)*100);
+  showAllAmort = false;
+  renderAmort();
+
+  // Perbandingan syariah
+  const plafonStr = fmtRp(plafon, true);
+  const tenorStr = tenorTahun + ' tahun';
+  setText('cs-plafon-bank', plafonStr);
+  document.getElementById('cs-bunga-bank').textContent = document.getElementById('bunga').value + '% p.a. (floating)';
+  document.getElementById('cs-tenor-bank').textContent = tenorStr;
+  setText('cs-cicilan-bank', fmtRp(cicilan) + '/bln');
+  setText('cs-total-bank', fmtRp(totalBayar));
+  setText('cs-riba-bank', fmtRp(totalRiba));
+  setText('cs-plafon-sy', plafonStr);
+  document.getElementById('cs-margin-sy').textContent = document.getElementById('margin').value + '% (FIX, tidak berubah)';
+  document.getElementById('cs-tenor-sy').textContent = tenorStr;
+  setText('cs-cicilan-sy', fmtRp(cicilanSyariah) + '/bln');
+  setText('cs-total-sy', fmtRp(totalSyariah));
+  setText('cs-margin-num-sy', fmtRp(marginNominal) + ' (margin)');
+  document.getElementById('pb-selisih').textContent =
+    (selisih > 0 ? '+' : '') + fmtRp(Math.abs(selisih), true);
+  document.getElementById('pb-selisih').style.color = selisih > 0 ? 'var(--red-light)' : 'var(--gold-light)';
+
+  // Scroll ke hasil
+  setTimeout(() => {
+    document.getElementById('hasil').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = val; el.classList.add('counting'); setTimeout(() => el.classList.remove('counting'), 900); }
+}
+
+// Hitung otomatis saat load
+window.addEventListener('load', hitung);
+</script>
+
+</body>
+</html>
